@@ -8,14 +8,29 @@ $email = '';
 $message = '';
 $errors = [];
 
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $message = trim($_POST['message'] ?? '');
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if (isset($_POST['name'])) {
+        $name = trim($_POST['name']);
+    } else {
+        $name = '';
+    }
+
+    if (isset($_POST['email'])) {
+        $email = trim($_POST['email']);
+    } else {
+        $email = '';
+    }
+
+    if (isset($_POST['message'])) {
+        $message = trim($_POST['message']);
+    } else {
+        $message = '';
+    }
 
     if (!validate_required($name)) {
         $errors['name'] = 'Name is required.';
-    } elseif (!validate_length($name, 2, 60)) {
+    } else if (!validate_length($name, 2, 60)) {
         $errors['name'] = 'Name must be 2 to 60 characters.';
     }
 
@@ -25,12 +40,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
     if (!validate_required($message)) {
         $errors['message'] = 'Message is required.';
-    } elseif (!validate_length($message, 10, 1000)) {
+    } else if (!validate_length($message, 10, 1000)) {
         $errors['message'] = 'Message must be 10 to 1000 characters.';
     }
 
-    if (count($errors) === 0) {
-        header('Location: index.php?success=1', true, 303);
+    if (empty($errors)) {
+        header('Location: success.php', true, 303);
         exit;
     }
 }
@@ -44,19 +59,25 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 <body>
   <h1>Contact Us</h1>
 
-  <?php if (isset($_GET['success'])): ?>
-    <p>Thank you! Your message has been sent.</p>
-  <?php endif; ?>
-
   <form method="post" action="index.php">
-    <label>Name <input type="text" name="name" value="<?= htmlspecialchars($name) ?>"></label>
-    <span class="error"><?= htmlspecialchars($errors['name'] ?? '') ?></span><br>
 
-    <label>Email <input type="email" name="email" value="<?= htmlspecialchars($email) ?>"></label>
-    <span class="error"><?= htmlspecialchars($errors['email'] ?? '') ?></span><br>
+    <label>Name <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>"></label>
+    <?php if (isset($errors['name'])) { ?>
+      <span class="error"><?php echo htmlspecialchars($errors['name']); ?></span>
+    <?php } ?>
+    <br>
 
-    <label>Message <textarea name="message"><?= htmlspecialchars($message) ?></textarea></label>
-    <span class="error"><?= htmlspecialchars($errors['message'] ?? '') ?></span><br>
+    <label>Email <input type="email" name="email" value="<?php echo htmlspecialchars($email); ?>"></label>
+    <?php if (isset($errors['email'])) { ?>
+      <span class="error"><?php echo htmlspecialchars($errors['email']); ?></span>
+    <?php } ?>
+    <br>
+
+    <label>Message <textarea name="message"><?php echo htmlspecialchars($message); ?></textarea></label>
+    <?php if (isset($errors['message'])) { ?>
+      <span class="error"><?php echo htmlspecialchars($errors['message']); ?></span>
+    <?php } ?>
+    <br>
 
     <button type="submit">Send</button>
   </form>
